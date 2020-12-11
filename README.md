@@ -1,2 +1,2 @@
 # S16MazeGenerator
-A maze generating and rendering program using recurssive backtracking written in Sigma16
+A maze generating and rendering program using recursive backtracking written in Sigma16
