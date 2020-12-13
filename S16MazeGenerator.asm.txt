@@ -10,10 +10,10 @@
 ; R1, R2, R3 are used for parameters
 ; R4 - R12 are available for local use
 ; The following registers are reserved for specific purposes:
-; 	R0  = constant 0
-; 	R13 = return address
-; 	R14 = position in stack = from 0 corresponding to &heap + ( position * 2 )
-; 	R15 = transient condition code
+;   R0  = constant 0
+;   R13 = return address
+;   R14 = position in stack = from 0 corresponding to &heap + ( position * 2 )
+;   R15 = transient condition code
 
 load r1,width[r0]
 load r2,height[r0]
@@ -33,8 +33,8 @@ jal r13,printCells[r0]
 trap r0,r0,r0
 
 randomNum
-	; seed := ( seed * a + c ) % m
-	load r4,seed[r0]
+    ; seed := ( seed * a + c ) % m
+    load r4,seed[r0]
     load r5,a[r0]
     
     mul r4,r4,r5 ; r4 := seed * a
@@ -50,49 +50,49 @@ randomNum
 allocateMemory
     load r4,celllength[r0] ; r11 := celllength
     lea r5,1[r0] ; constant 1
-	lea r6,0[r0] ; i = 0
+    lea r6,0[r0] ; i = 0
     lea r9,0[r0] ; stacklength
     lea r10,0[r0] ; cellslength
 
-	allocateMemory_compute_outerloop
-    	lea r7,0[r0] ; j = 0
+    allocateMemory_compute_outerloop
+        lea r7,0[r0] ; j = 0
         allocateMemory_compute_innerloop
-        	add r9,r9,r5
+            add r9,r9,r5
             add r9,r9,r5 ; stacklength := stacklength + 2 = stacklength + len( x_coords, y_coord )
             ;add r10,r10,r4 ; cellslength := cellslength + celllength
 
-			add r7,r7,r5 ; j++
+            add r7,r7,r5 ; j++
             
             cmp r7,r1 ; j < width
             jumplt allocateMemory_compute_innerloop[r0] ; for ( j = 0; j < width; j++ )
             
         add r6,r6,r5 ; i++
 
-		cmp r6,r2 ; i < height 
+        cmp r6,r2 ; i < height 
         jumplt allocateMemory_compute_outerloop[r0] ; ; for ( i = 0; i < height; i++ )
 
-	store r9,stacklength[r0]
+    store r9,stacklength[r0]
     ;store r10,cellslength[r0]
 
-	jump 0[r13]
+    jump 0[r13]
 
 buildCells
-	lea r4,1[r0] ; constant 1
+    lea r4,1[r0] ; constant 1
     load r5,celllength[r0]
-	lea r6,0[r0] ; r6 := i = 0
+    lea r6,0[r0] ; r6 := i = 0
     
     buildCells_outerloop
-    	lea r7,0[r0] ; r7 := j = 0
-	    buildCells_innerloop
-	        load r8,stacklength[r0]
-	    	lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
+        lea r7,0[r0] ; r7 := j = 0
+        buildCells_innerloop
+            load r8,stacklength[r0]
+            lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
         
             mul r9,r6,r5 
             mul r9,r9,r1 ; r9 := height offset = width * i * celllength
-			mul r10,r7,r5 ; r10 := width offset = j * celllength
+            mul r10,r7,r5 ; r10 := width offset = j * celllength
             
             add r9,r10,r9 ; r9 := height offset + width offset
-			add r8,r9,r8 ; r8 := beginning of cell allocation area = &heap + stacklength + height offset + width offset
+            add r8,r9,r8 ; r8 := beginning of cell allocation area = &heap + stacklength + height offset + width offset
             
             store r6,0[r8]
             store r7,1[r8]
@@ -109,62 +109,62 @@ buildCells
         
         add r6,r6,r4 ; i++
 
-		cmp r6,r2 ; i < height 
+        cmp r6,r2 ; i < height 
         jumplt buildCells_outerloop[r0] ; ; for ( i = 0; i < height; i++ )
-        	
+            
     jump 0[r13]
     
 printCells
-	lea r4,1[r0] ; constant 1
+    lea r4,1[r0] ; constant 1
     lea r12,2[r0] ; constant 2
     load r5,celllength[r0]
-	lea r6,0[r0] ; r6 := i = 0
+    lea r6,0[r0] ; r6 := i = 0
 
-	printCells_outerloop
-    	lea r7,0[r0] ; r7 := j = 0
-	    printCells_innerloop_north
-	        load r8,stacklength[r0]
-	    	lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
+    printCells_outerloop
+        lea r7,0[r0] ; r7 := j = 0
+        printCells_innerloop_north
+            load r8,stacklength[r0]
+            lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
             
-        	mul r9,r6,r5 
+            mul r9,r6,r5 
             mul r9,r9,r1 ; r9 := height offset = width * i * celllength
-			mul r10,r7,r5 ; r10 := width offset = j * celllength
+            mul r10,r7,r5 ; r10 := width offset = j * celllength
             
             add r9,r10,r9 ; r9 := height offset + width offset
-			add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
+            add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
             
             load r11,3[r8] ; load north wall
             
             cmp r11,r0 ; check if its broken
             jumpne printCells_innerloop_north_else[r0] ; if its not broken, jump
-            	load r11,1[r8]
+                load r11,1[r8]
                 
                 cmp r11,r0
-            	jumpne printCells_innerloop_north_if_greaterthan0[r0] ; if x != 0, jump
-                	lea r9,corner[r0]
-                	trap r12,r9,r4 ; print a corner
+                jumpne printCells_innerloop_north_if_greaterthan0[r0] ; if x != 0, jump
+                    lea r9,corner[r0]
+                    trap r12,r9,r4 ; print a corner
                 
                 printCells_innerloop_north_if_greaterthan0
-              	lea r9,ceiling[r0]
-	            trap r12,r9,r4
-    	        trap r12,r9,r4 ; print two ceilings
+                lea r9,ceiling[r0]
+                trap r12,r9,r4
+                trap r12,r9,r4 ; print two ceilings
                 lea r9,corner[r0]
                 trap r12,r9,r4 ; print a corner
                 
                 jump printCells_innerloop_north_elsedone[r0] ; make sure to skip the else clause
             
             printCells_innerloop_north_else
-            	load r11,1[r8]
+                load r11,1[r8]
                 
                 cmp r11,r0
-            	jumpne printCells_innerloop_north_else_greaterthan0[r0] ; if x != 0, jump
-                	lea r9,corner[r0]
-                	trap r12,r9,r4 ; print a corner
+                jumpne printCells_innerloop_north_else_greaterthan0[r0] ; if x != 0, jump
+                    lea r9,corner[r0]
+                    trap r12,r9,r4 ; print a corner
                 
                 printCells_innerloop_north_else_greaterthan0
-              	lea r9,space[r0]
-	            trap r12,r9,r4
-    	        trap r12,r9,r4 ; print two space
+                lea r9,space[r0]
+                trap r12,r9,r4
+                trap r12,r9,r4 ; print two space
                 lea r9,corner[r0]
                 trap r12,r9,r4 ; print a corner
             
@@ -177,35 +177,35 @@ printCells
         lea r9,newline[r0]
         trap r12,r9,r4 ; print a newline
         
-		lea r7,0[r0] ; r7 := j = 0
-		printCells_innerloop_walls
-        	load r8,stacklength[r0]
-	    	lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
+        lea r7,0[r0] ; r7 := j = 0
+        printCells_innerloop_walls
+            load r8,stacklength[r0]
+            lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
             
-        	mul r9,r6,r5 
+            mul r9,r6,r5 
             mul r9,r9,r1 ; r9 := height offset = width * i * celllength
-			mul r10,r7,r5 ; r10 := width offset = j * celllength
+            mul r10,r7,r5 ; r10 := width offset = j * celllength
             
             add r9,r10,r9 ; r9 := height offset + width offset
-			add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
+            add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
             
             load r11,6[r8] ; load west wall
             
             cmp r11,r0 ; check if its broken
             jumpne printCells_innerloop_walls_else[r0] ; if its not broken, jump
-            	lea r9,wall[r0]
+                lea r9,wall[r0]
                 trap r12,r9,r4
                 lea r9,space[r0]
                 trap r12,r9,r4
                 trap r12,r9,r4 ; print wall + two spaces
 
-				jump printCells_innerloop_walls_elsedone[r0] ; skip else clause
+                jump printCells_innerloop_walls_elsedone[r0] ; skip else clause
                 
             printCells_innerloop_walls_else
-				lea r9,space[r0]
+                lea r9,space[r0]
                 trap r12,r9,r4
                 trap r12,r9,r4
-		        trap r12,r9,r4 ; print three spaces
+                trap r12,r9,r4 ; print three spaces
                 
             printCells_innerloop_walls_elsedone
             load r11,1[r8]
@@ -213,90 +213,90 @@ printCells
             
             cmp r11,r10 ; check if cell is furthest right
             jumpne printCells_innerloop_walls_notfurthestright[r0] ; if cell isnt furthest right, jump to else
-				load r11,4[r8]
+                load r11,4[r8]
             
-           		cmp r11,r0 ; check if cell has broken east wall
+                cmp r11,r0 ; check if cell has broken east wall
                 jumpne printCells_innerloop_walls_furthestright_nowall[r0] ; if theres no east wall, jump to else
-                	lea r9,wall[r0]
-	                trap r12,r9,r4 ; print a wall
+                    lea r9,wall[r0]
+                    trap r12,r9,r4 ; print a wall
                 
-                	jump printCells_innerloop_walls_notfurthestright[r0] ; skip else clause
+                    jump printCells_innerloop_walls_notfurthestright[r0] ; skip else clause
                     
                 printCells_innerloop_walls_furthestright_nowall
-                	lea r9,space[r0]
-	                trap r12,r9,r4 ; print a space
-                	
+                    lea r9,space[r0]
+                    trap r12,r9,r4 ; print a space
+                    
             printCells_innerloop_walls_notfurthestright
-	        add r7,r7,r4 ; j++
+            add r7,r7,r4 ; j++
             
             cmp r7,r1 ; j < width
             jumplt printCells_innerloop_walls[r0] ; for ( j = 0; j < width; j++ )
         
         load r8,stacklength[r0]
-	    lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
+        lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
         
         lea r7,0[r0] ; r7 := j = 0
         printCells_innerloop_south
-        	load r8,stacklength[r0]
-	    	lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
+            load r8,stacklength[r0]
+            lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
             
-        	mul r9,r6,r5 
+            mul r9,r6,r5 
             mul r9,r9,r1 ; r9 := height offset = width * i * celllength
-			mul r10,r7,r5 ; r10 := width offset = j * celllength
+            mul r10,r7,r5 ; r10 := width offset = j * celllength
             
             add r9,r10,r9 ; r9 := height offset + width offset
-			add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
+            add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
             
             load r11,0[r8]
             sub r10,r2,r4 ; height - 1 
             
             cmp r11,r10 ; check if cell is furthest down
             jumpne printCells_innerloop_south_notbottom[r0] ; if not the furthest down, exit out the loop
-            	load r11,1[r8]
+                load r11,1[r8]
             
-	            cmp r11,r0 ; check if cell x == 0
+                cmp r11,r0 ; check if cell x == 0
                 jumpne printCells_innerloop_south_notfirst[r0] ; if not first, jump
-            		lea r9,newline[r0]
-		        	trap r12,r9,r4 ; print a newline
+                    lea r9,newline[r0]
+                    trap r12,r9,r4 ; print a newline
                     
                 printCells_innerloop_south_notfirst
                 load r11,5[r8]
             
-	            cmp r11,r0 ; check if south wall
+                cmp r11,r0 ; check if south wall
                 jumpne printCells_innerloop_south_nowall[r0] ; if cell has no south wall, jump to else
-                	load r11,1[r8]
+                    load r11,1[r8]
             
-		            cmp r11,r0 ; check if x == 0
+                    cmp r11,r0 ; check if x == 0
                     jumpne printCells_innerloop_south_wall_first[r0] ; if not first, jump
-              			lea r9,corner[r0]
-		                trap r12,r9,r4 ; print a corner
+                        lea r9,corner[r0]
+                        trap r12,r9,r4 ; print a corner
                     
                     printCells_innerloop_south_wall_first
                     lea r9,ceiling[r0]
                     trap r12,r9,r4
                     trap r12,r9,r4 ; print two ceilings
                     lea r9,corner[r0]
-		            trap r12,r9,r4 ; print a corner
-		            
-                	jump printCells_innerloop_south_nowalldone[r0] ; skip else clause
+                    trap r12,r9,r4 ; print a corner
+                    
+                    jump printCells_innerloop_south_nowalldone[r0] ; skip else clause
                     
                 printCells_innerloop_south_nowall
-                	load r11,1[r8]
+                    load r11,1[r8]
             
-		            cmp r11,r0 ; check if x == 0
+                    cmp r11,r0 ; check if x == 0
                     jumpne printCells_innerloop_south_nowall_first[r0] ; if not first, jump
-              			lea r9,corner[r0]
-		                trap r12,r9,r4 ; print a corner
+                        lea r9,corner[r0]
+                        trap r12,r9,r4 ; print a corner
                     
                     printCells_innerloop_south_nowall_first
                     lea r9,space[r0]
                     trap r12,r9,r4
                     trap r12,r9,r4 ; print two spaces
                     lea r9,corner[r0]
-		            trap r12,r9,r4 ; print a corner
+                    trap r12,r9,r4 ; print a corner
                 
                 printCells_innerloop_south_nowalldone
-        	
+            
             add r7,r7,r4 ; j++
             
             cmp r7,r1 ; j < width
@@ -309,42 +309,42 @@ printCells
         
         add r6,r6,r4 ; i++
 
-		cmp r6,r2 ; i < height 
+        cmp r6,r2 ; i < height 
         jumplt printCells_outerloop[r0] ; ; for ( i = 0; i < height; i++ )
-        	
+            
     jump 0[r13]
 
 generateMaze
-	lea r6,1[r0]
-	
+    lea r6,1[r0]
+    
     ; base case
     cmp r14,r0
     
     jumpne generateMaze_recursive[r0] ; if stack does have something in it, jump
-    	cmp r6,r3
+        cmp r6,r3
         
         jumpeq generateMaze_recursive[r0] ; if first == True, jump
-        	jump 0[r13]
+            jump 0[r13]
     
     ; recursive step
     generateMaze_recursive
-    	load r8,stacklength[r0]
-	    lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
+        load r8,stacklength[r0]
+        lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
             
         load r4,celllength[r0]
         load r7,width[r0]
             
         mul r9,r4,r1 
         mul r9,r9,r7 ; r9 := height offset = width * i * celllength
-		mul r10,r2,r4 ; r10 := width offset = j * celllength
+        mul r10,r2,r4 ; r10 := width offset = j * celllength
             
         add r9,r10,r9 ; r9 := height offset + width offset
-		add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
+        add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
             
         store r6,2[r8] ; store that the cell is visited
-    	
+        
         generateMaze_recursive_loop
-        	jal r6,randomNum[r0]
+            jal r6,randomNum[r0]
             load r3,seed[r0]
 
             lea r4,4[r0]
@@ -360,14 +360,14 @@ generateMaze
             cmp r4,r11
             
             jumpge generateMaze_recursive_loop_else[r0] ; if chosen_cell_y >= height, then goto else
-            	lea r11,-1[r0]
+                lea r11,-1[r0]
                 
                 cmp r4,r11
                 jumple generateMaze_recursive_loop_else[r0] ; if chosen_cell_y <= - 1, then goto else
-                	add r11,r14,r14 ; r11 := position * 2
+                    add r11,r14,r14 ; r11 := position * 2
                     lea r11,heap[r11] ; r11 := &heap + ( position * 2 )
                 
-            		store r1,0[r11] ; push cell_y
+                    store r1,0[r11] ; push cell_y
                     lea r11,1[r11]
                     store r2,0[r11] ; push cell_x
                     
@@ -379,16 +379,16 @@ generateMaze
                     jump generateMaze[r0]
             
             generateMaze_recursive_loop_else
-            	lea r11,-1[r0]
+                lea r11,-1[r0]
             
-        		cmp r4,r11
+                cmp r4,r11
                 jumpne generateMaze_recursive_loop[r0] ; if chosen_cell_y != 0, jump to the start of the loop again
-                	add r11,r14,r14 ; r11 := position * 2
+                    add r11,r14,r14 ; r11 := position * 2
                     lea r11,heap[r11] ; r11 := &heap + ( position * 2 )
                     
                     lea r11,-1[r11] ; r11 := &heap + ( position * 2 ) - 1 = location of x coord of last pushed coord set
                 
-            		load r2,0[r11] ; cell_x = pop()
+                    load r2,0[r11] ; cell_x = pop()
                     store r0,0[r11]
                     lea r11,-1[r11]
                     load r1,0[r11] ; cell_y = pop()
@@ -398,80 +398,80 @@ generateMaze
                     
                     jump generateMaze[r0]
                 
-        	jump generateMaze_recursive_loop[r0]
-	
+            jump generateMaze_recursive_loop[r0]
+    
     
 chooseCell
-	load r4,celllength[r0]
+    load r4,celllength[r0]
     lea r11,1[r0] ; bad = True
     
     cmp r1,r0
     
     jumple chooseCell_eastwallcheck[r0]
-    	load r8,stacklength[r0]
-	    lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
+        load r8,stacklength[r0]
+        lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
             
         lea r7,1[r0]
         sub r9,r1,r7 ; r9 := cell_y - 1
         mul r9,r4,r9 ; r9 := cell_y * celllength
         load r7,width[r0]
         mul r9,r9,r7 ; r9 := height offset = width * i * celllength
-		mul r10,r2,r4 ; r10 := width offset = j * celllength
+        mul r10,r2,r4 ; r10 := width offset = j * celllength
             
         add r9,r10,r9 ; r9 := height offset + width offset
-		add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
+        add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
         
         load r8,2[r8] ; r8 := chosen_cell.visited
         
         cmp r8,r0
         
         jumpne chooseCell_eastwallcheck[r0] ; if cell.visited == True, then goto next test
-        	lea r11,0[r0] ; bad = False
+            lea r11,0[r0] ; bad = False
             
             lea r7,0[r0]
             
             cmp r7,r3
             
             jumpne chooseCell_eastwallcheck[r0] ; if random_int and north's indice don't match, got to next test
-            	load r8,stacklength[r0]
-	    		lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
+                load r8,stacklength[r0]
+                lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
             
-		        lea r7,1[r0]
-        		sub r9,r1,r7 ; r9 := cell_y - 1
+                lea r7,1[r0]
+                sub r9,r1,r7 ; r9 := cell_y - 1
                 
                 add r4,r9,r0 ; current_cell_y := cell_y - 1
                 add r5,r2,r0 ; current_cell_x := cell_x
-		        
+                
                 load r7,celllength[r0]
                 mul r9,r7,r9 ; r9 := cell_y * celllength
-        		load r7,width[r0]
-		        mul r9,r9,r7 ; r9 := height offset = width * i * celllength
+                load r7,width[r0]
+                mul r9,r9,r7 ; r9 := height offset = width * i * celllength
                 load r7,celllength[r0]
-				mul r10,r2,r7 ; r10 := width offset = j * celllength
+                mul r10,r2,r7 ; r10 := width offset = j * celllength
             
-		        add r9,r10,r9 ; r9 := height offset + width offset
-				add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
+                add r9,r10,r9 ; r9 := height offset + width offset
+                add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
         
-        		lea r7,1[r0]
+                lea r7,1[r0]
         
-		        store r7,5[r8] ; r8 := chosen_cell.south wall is broken
+                store r7,5[r8] ; r8 := chosen_cell.south wall is broken
                 
                 load r8,stacklength[r0]
-	    		lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
+                lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
             
-            	load r7,celllength[r0]
-		        mul r9,r7,r1 ; r9 := cell_y * celllength
-                load r7,width[r0]
-		        mul r9,r9,r7 ; r9 := height offset = width * i * celllength
                 load r7,celllength[r0]
-				mul r10,r2,r4 ; r10 := width offset = j * celllength
+                mul r9,r7,r1 ; r9 := cell_y * celllength
+                load r7,width[r0]
+                mul r9,r9,r7 ; r9 := height offset = width * i * celllength
+                load r7,celllength[r0]
+                mul r10,r2,r7 ; r10 := width offset = j * celllength
             
-		        add r9,r10,r9 ; r9 := height offset + width offset
-				add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
+                add r9,r10,r9 ; r9 := height offset + width offset
+                add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
         
-        		lea r7,1[r0]
+                lea r7,1[r0]
         
-		        store r7,3[r8] ; r8 := cell.north wall is broken
+                store r7,3[r8] ; r8 := cell.north wall is broken
                 
                 jump chooseCell_return[r0]
     
@@ -484,38 +484,38 @@ chooseCell
     cmp r2,r7
     
     jumpge chooseCell_southwallcheck[r0]
-    	load r8,stacklength[r0]
-	    lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
+        load r8,stacklength[r0]
+        lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
         
         mul r9,r4,r1 ; r9 := cell_y * celllength
         load r7,width[r0]
         mul r9,r9,r7 ; r9 := height offset = width * i * celllength
         lea r7,1[r0]
         add r10,r2,r7
-		mul r10,r10,r4 ; r10 := width offset = j * celllength
+        mul r10,r10,r4 ; r10 := width offset = j * celllength
             
         add r9,r10,r9 ; r9 := height offset + width offset
-		add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
+        add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
         
         load r8,2[r8] ; r8 := chosen_cell.visited
         
         cmp r8,r0
         
         jumpne chooseCell_southwallcheck[r0] ; if cell.visited == True, then goto next test
-        	lea r11,0[r0] ; bad = False
+            lea r11,0[r0] ; bad = False
             
             lea r7,1[r0]
             
             cmp r7,r3
             
             jumpne chooseCell_southwallcheck[r0] ; if random_int and east's indice don't match, got to next test
-            	load r8,stacklength[r0]
-	    		lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
+                load r8,stacklength[r0]
+                lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
             
-            	load r7,celllength[r0]
-		        mul r9,r7,r1 ; r9 := cell_y * celllength
-        		load r7,width[r0]
-		        mul r9,r9,r7 ; r9 := height offset = width * i * celllength
+                load r7,celllength[r0]
+                mul r9,r7,r1 ; r9 := cell_y * celllength
+                load r7,width[r0]
+                mul r9,r9,r7 ; r9 := height offset = width * i * celllength
                 lea r7,1[r0]
                 add r10,r2,r7
                 
@@ -523,31 +523,31 @@ chooseCell
                 add r5,r10,r0 ; current_cell_x := cell_x + 1
                 
                 load r7,celllength[r0]
-				mul r10,r10,r7 ; r10 := width offset = j * celllength
+                mul r10,r10,r7 ; r10 := width offset = j * celllength
                 
                 add r9,r10,r9 ; r9 := height offset + width offset
-				add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
+                add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
         
-        		lea r7,1[r0]
+                lea r7,1[r0]
         
-		        store r7,6[r8] ; r8 := chosen_cell.west wall is broken
+                store r7,6[r8] ; r8 := chosen_cell.west wall is broken
                 
                 load r8,stacklength[r0]
-	    		lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
+                lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
             
-            	load r7,celllength[r0]
-		        mul r9,r7,r1 ; r9 := cell_y * celllength
-                load r7,width[r0]
-		        mul r9,r9,r7 ; r9 := height offset = width * i * celllength
                 load r7,celllength[r0]
-				mul r10,r2,r7 ; r10 := width offset = j * celllength
+                mul r9,r7,r1 ; r9 := cell_y * celllength
+                load r7,width[r0]
+                mul r9,r9,r7 ; r9 := height offset = width * i * celllength
+                load r7,celllength[r0]
+                mul r10,r2,r7 ; r10 := width offset = j * celllength
             
-		        add r9,r10,r9 ; r9 := height offset + width offset
-				add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
+                add r9,r10,r9 ; r9 := height offset + width offset
+                add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
         
-        		lea r7,1[r0]
+                lea r7,1[r0]
         
-		        store r7,4[r8] ; r8 := cell.east wall is broken
+                store r7,4[r8] ; r8 := cell.east wall is broken
                 
                 jump chooseCell_return[r0]
     
@@ -560,70 +560,70 @@ chooseCell
     cmp r1,r7
     
     jumpge chooseCell_westwallcheck[r0]
-    	load r8,stacklength[r0]
-	    lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
+        load r8,stacklength[r0]
+        lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
             
         lea r7,1[r0]
         add r9,r1,r7 ; r9 := cell_y + 1
         mul r9,r4,r9 ; r9 := cell_y * celllength
         load r7,width[r0]
         mul r9,r9,r7 ; r9 := height offset = width * i * celllength
-		mul r10,r2,r4 ; r10 := width offset = j * celllength
+        mul r10,r2,r4 ; r10 := width offset = j * celllength
             
         add r9,r10,r9 ; r9 := height offset + width offset
-		add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
+        add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
         
         load r8,2[r8] ; r8 := chosen_cell.visited
         
         cmp r8,r0
         
         jumpne chooseCell_westwallcheck[r0] ; if cell.visited == True, then goto next test
-        	lea r11,0[r0] ; bad = False
+            lea r11,0[r0] ; bad = False
             
             lea r7,2[r0]
             
             cmp r7,r3
             
             jumpne chooseCell_westwallcheck[r0] ; if random_int and north's indice don't match, got to next test
-            	load r8,stacklength[r0]
-	    		lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
+                load r8,stacklength[r0]
+                lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
             
-		        lea r7,1[r0]
-        		add r9,r1,r7 ; r9 := cell_y + 1
+                lea r7,1[r0]
+                add r9,r1,r7 ; r9 := cell_y + 1
                 
                 add r4,r9,r0 ; current_cell_y := cell_y + 1
                 add r5,r2,r0 ; current_cell_x := cell_x
-		        
+                
                 load r7,celllength[r0]
                 mul r9,r7,r9 ; r9 := cell_y * celllength
-        		load r7,width[r0]
-		        mul r9,r9,r7 ; r9 := height offset = width * i * celllength
+                load r7,width[r0]
+                mul r9,r9,r7 ; r9 := height offset = width * i * celllength
                 load r7,celllength[r0]
-				mul r10,r2,r7 ; r10 := width offset = j * celllength
+                mul r10,r2,r7 ; r10 := width offset = j * celllength
             
-		        add r9,r10,r9 ; r9 := height offset + width offset
-				add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
+                add r9,r10,r9 ; r9 := height offset + width offset
+                add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
         
-        		lea r7,1[r0]
+                lea r7,1[r0]
         
-		        store r7,3[r8] ; r8 := chosen_cell.north wall is broken
+                store r7,3[r8] ; r8 := chosen_cell.north wall is broken
                 
                 load r8,stacklength[r0]
-	    		lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
+                lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
             
-            	load r7,celllength[r0]
-		        mul r9,r7,r1 ; r9 := cell_y * celllength
-                load r7,width[r0]
-		        mul r9,r9,r7 ; r9 := height offset = width * i * celllength
                 load r7,celllength[r0]
-				mul r10,r2,r7 ; r10 := width offset = j * celllength
+                mul r9,r7,r1 ; r9 := cell_y * celllength
+                load r7,width[r0]
+                mul r9,r9,r7 ; r9 := height offset = width * i * celllength
+                load r7,celllength[r0]
+                mul r10,r2,r7 ; r10 := width offset = j * celllength
             
-		        add r9,r10,r9 ; r9 := height offset + width offset
-				add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
+                add r9,r10,r9 ; r9 := height offset + width offset
+                add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
         
-        		lea r7,1[r0]
+                lea r7,1[r0]
         
-		        store r7,5[r8] ; r8 := cell.south wall is broken
+                store r7,5[r8] ; r8 := cell.south wall is broken
                 
                 jump chooseCell_return[r0]
     
@@ -631,99 +631,100 @@ chooseCell
     cmp r2,r0
     
     jumple chooseCell_finaloption[r0]
-    	load r8,stacklength[r0]
-	    lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
+        load r8,stacklength[r0]
+        lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
         
         mul r9,r4,r1 ; r9 := cell_y * celllength
         load r7,width[r0]
         mul r9,r9,r7 ; r9 := height offset = width * i * celllength
         lea r7,1[r0]
         sub r10,r2,r7
-		mul r10,r10,r4 ; r10 := width offset = j * celllength
+        mul r10,r10,r4 ; r10 := width offset = j * celllength
             
         add r9,r10,r9 ; r9 := height offset + width offset
-		add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
+        add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
         
         load r8,2[r8] ; r8 := chosen_cell.visited
         
         cmp r8,r0
         
         jumpne chooseCell_finaloption[r0] ; if cell.visited == True, then goto next test
-        	lea r11,0[r0] ; bad = False
+            lea r11,0[r0] ; bad = False
             
             lea r7,3[r0]
             
             cmp r7,r3
             
             jumpne chooseCell_finaloption[r0] ; if random_int and west's indice don't match, got to next test
-            	load r8,stacklength[r0]
-	    		lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
+                load r8,stacklength[r0]
+                lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
             
-            	load r7,celllength[r0]
-		        mul r9,r7,r1 ; r9 := cell_y * celllength
-        		load r7,width[r0]
-		        mul r9,r9,r7 ; r9 := height offset = width * i * celllength
+                load r7,celllength[r0]
+                mul r9,r7,r1 ; r9 := cell_y * celllength
+                load r7,width[r0]
+                mul r9,r9,r7 ; r9 := height offset = width * i * celllength
                 lea r7,1[r0]
                 sub r10,r2,r7
                 
                 add r4,r1,r0 ; current_cell_y := cell_y
                 add r5,r10,r0 ; current_cell_x := cell_x - 1
                 
-				mul r10,r10,r7 ; r10 := width offset = j * celllength
+                load r7,celllength[r0]
+                mul r10,r10,r7 ; r10 := width offset = j * celllength
                 
-		        add r9,r10,r9 ; r9 := height offset + width offset
-				add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
+                add r9,r10,r9 ; r9 := height offset + width offset
+                add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
         
-        		lea r7,1[r0]
+                lea r7,1[r0]
         
-		        store r7,4[r8] ; r8 := chosen_cell.east wall is broken
+                store r7,4[r8] ; r8 := chosen_cell.east wall is broken
                 
                 load r8,stacklength[r0]
-	    		lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
+                lea r8,heap[r8] ; r8 := &heap + stacklength = beginning of cell allocation heap
             
-            	load r7,celllength[r0]
-		        mul r9,r7,r1 ; r9 := cell_y * celllength
-                load r7,width[r0]
-		        mul r9,r9,r7 ; r9 := height offset = width * i * celllength
                 load r7,celllength[r0]
-				mul r10,r2,r7 ; r10 := width offset = j * celllength
+                mul r9,r7,r1 ; r9 := cell_y * celllength
+                load r7,width[r0]
+                mul r9,r9,r7 ; r9 := height offset = width * i * celllength
+                load r7,celllength[r0]
+                mul r10,r2,r7 ; r10 := width offset = j * celllength
             
-		        add r9,r10,r9 ; r9 := height offset + width offset
-				add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
+                add r9,r10,r9 ; r9 := height offset + width offset
+                add r8,r9,r8 ; r8 := beginning of cell of interest = &heap + stacklength + height offset + width offset
         
-        		lea r7,1[r0]
+                lea r7,1[r0]
         
-		        store r7,6[r8] ; r8 := cell.west wall is broken
+                store r7,6[r8] ; r8 := cell.west wall is broken
                 
                 jump chooseCell_return[r0]
 
-	chooseCell_finaloption
-	cmp r11,r0
+    chooseCell_finaloption
+    cmp r11,r0
     
     jumpne chooseCell_finaloption_isinvalid[r0]
-    	lea r8,1[r0] 
-    	load r7,height[r0]
+        lea r8,1[r0] 
+        load r7,height[r0]
         add r4,r8,r7 ; chosen_cell_y := height + 1
         
-    	load r7,width[r0]
+        load r7,width[r0]
         add r5,r8,r7 ; chosen_cell_x := width + 1
         
         jump chooseCell_return[r0]
     
     chooseCell_finaloption_isinvalid
-    	lea r7,-1[r0]
+        lea r7,-1[r0]
         add r4,r7,r0 ; chosen_cell_y := -1
         add r5,r7,r0 ; chosen_cell_x := -1
         
         jump chooseCell_return[r0]
 
-	chooseCell_return
-	jump 0[r6]
+    chooseCell_return
+    jump 0[r6]
 
 ; parameters
-height data 3
-width data 3
-seed data 1238
+height data 4
+width data 4
+seed data 1234
 
 ; constants
 m data 31
