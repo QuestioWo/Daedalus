@@ -54,7 +54,7 @@ For a more complex example, here is a `16`x`16` with a seed of `1234` :
 ```
 
 ## Running
-This atrocious program can be ran by copying the `S16MazeGenerator.asm.text` file into the text area in the `Editor` tab of the [Sigma16 emulator](https://questiowo.github.io/Sigma17). This program was only written for use in [this](https://questiowo.github.io/Sigma17) emulator as it was easier than using the original.
+This atrocious program can be ran by copying the [S16MazeGenerator.asm.txt](https://raw.githubusercontent.com/QuestioWo/MazeGeneratorSigma16/main/S16MazeGenerator.asm.txt) file into the text area in the `Editor` tab of the [Sigma16 emulator](https://questiowo.github.io/Sigma17). This program was only written for use in [this](https://questiowo.github.io/Sigma17) emulator as it was easier than using the original.
 
 It can be made to run in the original emulator by exporting it to Raw Compatible using the down-arrow next to the Download button on the same Editor tab. You will also have to remove line `3` as the copyright symbol is invalid in the orignal.
 
