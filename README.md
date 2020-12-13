@@ -1,4 +1,4 @@
-A maze generating and rendering program using recursive backtracking written in Sigma16. This was written cause I was bored during the exam diet and needed something to do. It also served as a way of better testing the [Sigma17](https://questiowo.github.io/Sigma17) emulator.
+This was written cause I was bored during the exam diet and needed something to do. It also served as a way of better testing the [Sigma17](https://questiowo.github.io/Sigma17) emulator.
 
 ## Results 
 In the output of the emulator after running this horrid program, there will be an ascii interpretation of the generated maze printed. For a `4`x`4` maze with the seed `1234`, as is the default when running this project, the below will be printed:
