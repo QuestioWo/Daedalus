@@ -1,12 +1,12 @@
-;===========================================================================;
+;==============================================================================
 ;
 ; Copyright Jim Carty © 2020
 ;
 ; This file is subject to the terms and conditions defined in file
 ; 'LICENSE.txt', which is part of this source code package.
 ;
-;===========================================================================;
-
+;==============================================================================
+;
 ; R1, R2, R3 are used for parameters
 ; R4, R5 are used for return statements, only chooseCell
 ; R6 is used for nested functions return addresses
