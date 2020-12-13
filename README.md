@@ -1,7 +1,7 @@
-A maze generating and rendering program using recursive backtracking written in Sigma16. This was written cause I was bored during the exam diet and needed something to do.
+A maze generating and rendering program using recursive backtracking written in Sigma16. This was written cause I was bored during the exam diet and needed something to do. It also served as a way of better testing the [Sigma17](https://questiowo.github.io/Sigma17) emulator.
 
 ## Running
-This atrocious program can be ran by copying the S16MazeGenerator.asm.text file into the text area in the Editor tab of the [Sigma16 emulator](https://questiowo.github.io/Sigma17). This program was only written for use in this emulator as it was easier than capitalising every "r". It can be made to run in the original emulator by exporting it to Raw Compatible using the down-arrow next to the Download button on the same Editor tab. I wouldn't recommend it, I'd guess it'd take forever and a day.
+This atrocious program can be ran by copying the `S16MazeGenerator.asm.text` file into the text area in the `Editor` tab of the [Sigma16 emulator](https://questiowo.github.io/Sigma17). This program was only written for use in [this](https://questiowo.github.io/Sigma17) emulator as it was easier than capitalising every "r". It can be made to run in the original emulator by exporting it to Raw Compatible using the down-arrow next to the Download button on the same Editor tab. I wouldn't recommend it, I'd guess it'd take forever and a day.
 
 ## Changing the output
 The output of the maze will be the same for each running, unless some constant values are changed. 
