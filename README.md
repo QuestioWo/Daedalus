@@ -1,7 +1,7 @@
 This was written cause I was bored during the exam diet and needed something to do. It also served as a way of better testing the [Sigma17](https://questiowo.github.io/Sigma17) emulator.
 
 ## Results 
-In the output of the emulator after running this horrid program, there will be an ascii interpretation of the generated maze printed. For a `4`x`4` maze with the seed `1234`, as is the default when running this project, the below will be printed:
+In the output of the emulator after running this horrid program, there will be an ascii interpretation of the generated maze printed. For a 4x4 maze with the seed `1234`, as is the default when running this project, the below will be printed:
 
 ```
 *--*--*--*--*
@@ -15,7 +15,7 @@ In the output of the emulator after running this horrid program, there will be a
 *--*--*--*--*
 ```
 
-For a more complex example, here is a `16`x`16` with a seed of `1234` :
+For a more complex example, here is a 16x16 with a seed of `1234` :
 
 ```
 *--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*
