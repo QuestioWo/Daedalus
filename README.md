@@ -63,7 +63,7 @@ The output of the maze will be the same for each running, unless some constant v
 
 The values that can be changed without incident are `height`, `width` and `seed`. These can all be found at the bottom of the file denoted by the `parameters` comment on line `733`. The `seed` will change the maze design as it changes the random number generator's seed. The `width` and `height` will, of course, change the widths and heights of the mazes generated. 
 
-There will exist combinations of maximum widths and heights but that requires maths.
+There does exist combinations of maximum widths and heights. As of v1.1, that limit is a number of cells of around 7211 cells. This is due to the program taking `0x279`, aka 633 cells of memory, and each additional cells requiring nine cells of memory as well - 2 for its position in the stack and 7 for its coordinate and boolean wall values. this limit can be achieved by running the program with the parameters of `height` = 1 and `width` = 7211, using up to and including `0xfff9`. Alternatively, for a more interesting maze than just a corridor, a maze of size 84x85 can be used as the parameters, using up to and including `0xfd7a`.
 
 ## `main.py`
 This contains a python version of the Sigma16 program for better understanding of the program. This can be ran using `python3 main.py` and requires no extra libraries. It can be modified in a similar way to Sigma16 version; changing the values of the `width`, `height`, and `seed` variables.
